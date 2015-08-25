@@ -6,6 +6,10 @@ import (
 	"crypto/rsa"
 	"fmt"
 	// "io/ioutil"
+	"bytes"
+	"encoding/gob"
+	"io"
+	"net"
 	"os"
 	"os/user"
 )
@@ -14,6 +18,41 @@ type Friend struct {
 	host      net.IP
 	publicKey *rsa.PublicKey
 	name      string
+}
+
+func getBytes(data interface{}) ([]byte, error) {
+	var buf bytes.Buffer
+	enc := gob.NewEncoder(&buf)
+	err := enc.Encode(data)
+	if err != nil {
+		return nil, err
+	}
+	return buf.Bytes(), nil
+}
+
+func getInterface(bts []byte, data interface{}) error {
+	buf := bytes.NewBuffer(bts)
+	dec := gob.NewDecoder(buf)
+	err := dec.Decode(data)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func save_file(title string, content []byte) error {
+	title = string(bytes.Trim([]byte(title), "\x00"))
+	content = bytes.Trim(content, "\x00")
+	file, err := os.Create(title)
+	if err != nil {
+		return err
+	}
+
+	_, err = io.WriteString(file, string(content))
+	if err != nil {
+		return err
+	}
+	return nil
 }
 
 func Decrypt(content []byte, privatekey *rsa.PrivateKey) ([]byte, error) {
@@ -57,6 +96,8 @@ func Generate() (*rsa.PrivateKey, *rsa.PublicKey, error) {
 	}
 
 	publickey = &privatekey.PublicKey
+	privatekey, _ := getBytes(privatekey)
+	save_file(usr.HomeDir+"/.rosa/key.priv", toto)
 
 	return privatekey, publickey, nil
 }
@@ -86,28 +127,17 @@ func isPubKeyAvailable() bool {
 	return false
 }
 
-// TODO FIND HOW WRITE RSA PRIVATE KEY (AND PUBLIC I ASSUME) TO A FILE, IT MIGHT BE "FUNNY"
-// func RetrievePrivate() *rsa.PrivateKey {
-// 	usr, err := user.Current()
-// 	if isPrivKeyAvailable() == false {
-// 		return nil
-// 	}
-// 	content, err := ioutil.ReadFile(usr.HomeDir + "/.rosa/key.priv")
-// 	if err != nil {
-// 		return nil
-// 	}
-// 	return content.(rsa.PrivateKey)
-// }
-// func RetrieveFriend() []Friend
-
 func main() {
+	usr, _ := user.Current()
+
+	var wierd *rsa.PrivateKey
 
 	privatekey, publickey, _ := Generate()
-
-	fmt.Printf("%v\n\n\n\n\n", []byte(privatekey))
+	toto
+	getInterface(toto, &wierd)
 
 	msg, _ := Encrypt([]byte("Hello world"), publickey)
-	decrypted, _ := Decrypt(msg, privatekey)
+	decrypted, _ := Decrypt(msg, wierd)
 
-	fmt.Printf("%v\n", decrypted)
+	fmt.Printf("%v\n", string(decrypted))
 }
