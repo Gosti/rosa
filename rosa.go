@@ -5,9 +5,16 @@ import (
 	"crypto/rand"
 	"crypto/rsa"
 	"fmt"
+	// "io/ioutil"
 	"os"
 	"os/user"
 )
+
+type Friend struct {
+	host      net.IP
+	publicKey *rsa.PublicKey
+	name      string
+}
 
 func Decrypt(content []byte, privatekey *rsa.PrivateKey) ([]byte, error) {
 	md5hash := md5.New()
@@ -54,41 +61,53 @@ func Generate() (*rsa.PrivateKey, *rsa.PublicKey, error) {
 	return privatekey, publickey, nil
 }
 
-func isKeyAvailable() bool {
-
+func isPrivKeyAvailable() bool {
 	usr, err := user.Current()
 	if err != nil {
 		return false
 	}
 
 	if _, err := os.Stat(usr.HomeDir + "/.rosa/key.priv"); err == nil {
-		if _, err := os.Stat(usr.HomeDir + "/.rosa/key.pub"); err == nil {
-			return true
-		}
-		return false
+		return true
 	}
 	return false
 }
 
-func Retrieve() (*rsa.PrivateKey, error) {
-	if isKeyAvailable() == false {
-		privatekey, publickey, err := Generate()
-		if err != nil {
-			return nil, err
-		}
-		return
-	} else {
+func isPubKeyAvailable() bool {
 
+	usr, err := user.Current()
+	if err != nil {
+		return false
 	}
+
+	if _, err := os.Stat(usr.HomeDir + "/.rosa/key.pub"); err == nil {
+		return true
+	}
+	return false
 }
+
+// TODO FIND HOW WRITE RSA PRIVATE KEY (AND PUBLIC I ASSUME) TO A FILE, IT MIGHT BE "FUNNY"
+// func RetrievePrivate() *rsa.PrivateKey {
+// 	usr, err := user.Current()
+// 	if isPrivKeyAvailable() == false {
+// 		return nil
+// 	}
+// 	content, err := ioutil.ReadFile(usr.HomeDir + "/.rosa/key.priv")
+// 	if err != nil {
+// 		return nil
+// 	}
+// 	return content.(rsa.PrivateKey)
+// }
+// func RetrieveFriend() []Friend
 
 func main() {
 
 	privatekey, publickey, _ := Generate()
 
+	fmt.Printf("%v\n\n\n\n\n", []byte(privatekey))
+
 	msg, _ := Encrypt([]byte("Hello world"), publickey)
 	decrypted, _ := Decrypt(msg, privatekey)
 
 	fmt.Printf("%v\n", decrypted)
-	fmt.Println(isKeyAvailable())
 }
