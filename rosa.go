@@ -1,4 +1,4 @@
-package main
+package rosa
 
 import (
 	"crypto/md5"
@@ -6,8 +6,6 @@ import (
 	"crypto/rsa"
 	"fmt"
 	// "io/ioutil"
-	"bytes"
-	"encoding/gob"
 	"io"
 	"net"
 	"os"
@@ -18,41 +16,6 @@ type Friend struct {
 	host      net.IP
 	publicKey *rsa.PublicKey
 	name      string
-}
-
-func getBytes(data interface{}) ([]byte, error) {
-	var buf bytes.Buffer
-	enc := gob.NewEncoder(&buf)
-	err := enc.Encode(data)
-	if err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
-}
-
-func getInterface(bts []byte, data interface{}) error {
-	buf := bytes.NewBuffer(bts)
-	dec := gob.NewDecoder(buf)
-	err := dec.Decode(data)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func save_file(title string, content []byte) error {
-	title = string(bytes.Trim([]byte(title), "\x00"))
-	content = bytes.Trim(content, "\x00")
-	file, err := os.Create(title)
-	if err != nil {
-		return err
-	}
-
-	_, err = io.WriteString(file, string(content))
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func Decrypt(content []byte, privatekey *rsa.PrivateKey) ([]byte, error) {
@@ -96,7 +59,7 @@ func Generate() (*rsa.PrivateKey, *rsa.PublicKey, error) {
 	}
 
 	publickey = &privatekey.PublicKey
-	privatekey, _ := getBytes(privatekey)
+	privatekey, _ = getBytes(privatekey)
 	save_file(usr.HomeDir+"/.rosa/key.priv", toto)
 
 	return privatekey, publickey, nil
