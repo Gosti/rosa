@@ -1,22 +1,12 @@
-package rosa
+package main
 
 import (
 	"crypto/md5"
 	"crypto/rand"
 	"crypto/rsa"
 	"fmt"
-	// "io/ioutil"
-	"io"
-	"net"
-	"os"
 	"os/user"
 )
-
-type Friend struct {
-	host      net.IP
-	publicKey *rsa.PublicKey
-	name      string
-}
 
 func Decrypt(content []byte, privatekey *rsa.PrivateKey) ([]byte, error) {
 	md5hash := md5.New()
@@ -41,11 +31,12 @@ func Encrypt(content []byte, publickey *rsa.PublicKey) ([]byte, error) {
 	return encryptedmsg, nil
 }
 
-func Generate() (*rsa.PrivateKey, *rsa.PublicKey, error) {
+func Generate(identifier string) (*rsa.PrivateKey, *rsa.PublicKey, error) {
 	var publickey *rsa.PublicKey
 	var privatekey *rsa.PrivateKey
 
-	privatekey, err := rsa.GenerateKey(rand.Reader, 1024)
+	usr, err := user.Current()
+	privatekey, err = rsa.GenerateKey(rand.Reader, 1024)
 
 	if err != nil {
 		return nil, nil, err
@@ -59,48 +50,23 @@ func Generate() (*rsa.PrivateKey, *rsa.PublicKey, error) {
 	}
 
 	publickey = &privatekey.PublicKey
-	privatekey, _ = getBytes(privatekey)
-	save_file(usr.HomeDir+"/.rosa/key.priv", toto)
 
+	savePrivateKey(privatekey, usr.HomeDir+"/.rosa/key.priv")
+	savePublicKey(publickey, identifier, usr.HomeDir+"/.rosa/key.pub")
 	return privatekey, publickey, nil
-}
-
-func isPrivKeyAvailable() bool {
-	usr, err := user.Current()
-	if err != nil {
-		return false
-	}
-
-	if _, err := os.Stat(usr.HomeDir + "/.rosa/key.priv"); err == nil {
-		return true
-	}
-	return false
-}
-
-func isPubKeyAvailable() bool {
-
-	usr, err := user.Current()
-	if err != nil {
-		return false
-	}
-
-	if _, err := os.Stat(usr.HomeDir + "/.rosa/key.pub"); err == nil {
-		return true
-	}
-	return false
 }
 
 func main() {
 	usr, _ := user.Current()
+	Generate("mrgosti")
+	_, err := LoadPrivateKey(usr.HomeDir + "/.rosa/key.priv")
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Printf("%+v", usr.Username)
 
-	var wierd *rsa.PrivateKey
+	// msg, _ := Encrypt([]byte("Hello world"), publickey)
+	// decrypted, _ := Decrypt(msg, wierd)
 
-	privatekey, publickey, _ := Generate()
-	toto
-	getInterface(toto, &wierd)
-
-	msg, _ := Encrypt([]byte("Hello world"), publickey)
-	decrypted, _ := Decrypt(msg, wierd)
-
-	fmt.Printf("%v\n", string(decrypted))
+	// fmt.Printf("%v\n", string(decrypted))
 }

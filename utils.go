@@ -1,8 +1,11 @@
-package rosa
+package main
 
 import (
 	"bytes"
 	"encoding/gob"
+	"io"
+	"io/ioutil"
+	"os"
 )
 
 func getBytes(data interface{}) ([]byte, error) {
@@ -25,10 +28,8 @@ func getInterface(bts []byte, data interface{}) error {
 	return nil
 }
 
-func save_file(title string, content []byte) error {
-	title = string(bytes.Trim([]byte(title), "\x00"))
-	content = bytes.Trim(content, "\x00")
-	file, err := os.Create(title)
+func save_file(filename string, content []byte) error {
+	file, err := os.Create(filename)
 	if err != nil {
 		return err
 	}
@@ -38,4 +39,10 @@ func save_file(title string, content []byte) error {
 		return err
 	}
 	return nil
+}
+
+// I know this function is pretty stupid but I really want All I/O manipulation and include in this file
+
+func load_file(filename string) ([]byte, error) {
+	return ioutil.ReadFile(filename)
 }
