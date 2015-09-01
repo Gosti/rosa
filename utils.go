@@ -33,7 +33,7 @@ func save_file(filename string, content []byte) error {
 	if err != nil {
 		return err
 	}
-
+	defer file.Close()
 	_, err = io.WriteString(file, string(content))
 	if err != nil {
 		return err

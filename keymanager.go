@@ -7,10 +7,8 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
-	"net"
 	"os"
 	"os/user"
-	"strings"
 )
 
 func savePrivateKey(key *rsa.PrivateKey, filename string) error {

@@ -58,13 +58,11 @@ func Generate(identifier string) (*rsa.PrivateKey, *rsa.PublicKey, error) {
 
 func main() {
 	usr, _ := user.Current()
-	Generate("mrgosti")
+	Generate(usr.Username)
 	_, err := LoadPrivateKey(usr.HomeDir + "/.rosa/key.priv")
 	if err != nil {
 		fmt.Println(err)
 	}
-	fmt.Printf("%+v", usr.Username)
-
 	// msg, _ := Encrypt([]byte("Hello world"), publickey)
 	// decrypted, _ := Decrypt(msg, wierd)
 
