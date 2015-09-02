@@ -31,7 +31,7 @@ func Encrypt(content []byte, publickey *rsa.PublicKey) ([]byte, error) {
 	return encryptedmsg, nil
 }
 
-func Generate(identifier string) (*rsa.PrivateKey, *rsa.PublicKey, error) {
+func Generate(identifier string, save bool) (*rsa.PrivateKey, *rsa.PublicKey, error) {
 	var publickey *rsa.PublicKey
 	var privatekey *rsa.PrivateKey
 
@@ -51,14 +51,17 @@ func Generate(identifier string) (*rsa.PrivateKey, *rsa.PublicKey, error) {
 
 	publickey = &privatekey.PublicKey
 
-	savePrivateKey(privatekey, usr.HomeDir+"/.rosa/key.priv")
-	savePublicKey(publickey, identifier, usr.HomeDir+"/.rosa/key.pub")
+	if save == true {
+		savePrivateKey(privatekey, usr.HomeDir+"/.rosa/key.priv")
+		savePublicKey(publickey, identifier, usr.HomeDir+"/.rosa/key.pub")
+	}
+
 	return privatekey, publickey, nil
 }
 
 func main() {
 	usr, _ := user.Current()
-	Generate(usr.Username)
+	Generate(usr.Username, true)
 	_, err := LoadPrivateKey(usr.HomeDir + "/.rosa/key.priv")
 	if err != nil {
 		fmt.Println(err)

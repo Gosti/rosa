@@ -28,7 +28,7 @@ func getInterface(bts []byte, data interface{}) error {
 	return nil
 }
 
-func save_file(filename string, content []byte) error {
+func saveFile(filename string, content []byte) error {
 	file, err := os.Create(filename)
 	if err != nil {
 		return err
@@ -43,6 +43,6 @@ func save_file(filename string, content []byte) error {
 
 // I know this function is pretty stupid but I really want All I/O manipulation and include in this file
 
-func load_file(filename string) ([]byte, error) {
+func loadFile(filename string) ([]byte, error) {
 	return ioutil.ReadFile(filename)
 }
