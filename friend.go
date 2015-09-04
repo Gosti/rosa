@@ -1,7 +1,6 @@
 package main
 
 import (
-	//"crypto/md5"
 	"crypto/rsa"
 	"fmt"
 	"strings"
@@ -14,7 +13,7 @@ type Friend struct {
 }
 
 //Local FriendList (if you have some friend)
-var FriendList []*Friend
+var FriendList map[string]*Friend
 
 func LoadFriends(filename string) error {
 	filecontent, err := loadFile(filename)
@@ -27,14 +26,14 @@ func LoadFriends(filename string) error {
 		if len(s) != 2 {
 			break
 		}
-		FriendList = append(FriendList, &Friend{s[0], UnStringifyPublicKey(s[1])})
+		FriendList[GetMD5Hash(s[1])] = &Friend{s[0], UnStringifyPublicKey(s[1])}
 	}
 	return nil
 }
 
 //Add friend f to FriendList In case I change simple list to a more complex type of data Binary tree or linked list will see later
 func (f *Friend) Add() error {
-	FriendList = append(FriendList, f)
+	FriendList[GetMD5Hash(StringifyPublicKey(f.PublicKey))] = f
 	return nil
 }
 
@@ -49,9 +48,14 @@ func (f *Friend) Registrer(filename string) error {
 }
 
 func (f *Friend) Remove(filename string) error {
+	delete(FriendList, GetMD5Hash(StringifyPublicKey(f.PublicKey)))
 	return nil
 }
 
 func (f *Friend) Encrypt(content []byte) ([]byte, error) {
 	return Encrypt(content, f.PublicKey)
+}
+
+func init() {
+	FriendList = make(map[string]*Friend)
 }
