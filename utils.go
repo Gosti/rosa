@@ -46,3 +46,17 @@ func saveFile(filename string, content []byte) error {
 func loadFile(filename string) ([]byte, error) {
 	return ioutil.ReadFile(filename)
 }
+
+func appendFile(filename string, content []byte) error {
+	file, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY|os.O_CREATE, 0600)
+	if err != nil {
+		return err
+	}
+
+	defer file.Close()
+
+	if _, err = file.Write(content); err != nil {
+		return err
+	}
+	return nil
+}

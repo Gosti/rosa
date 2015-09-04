@@ -7,6 +7,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"fmt"
+	"math/big"
 	"os"
 	"os/user"
 )
@@ -27,9 +28,22 @@ func savePrivateKey(key *rsa.PrivateKey, filename string) error {
 	return nil
 }
 
+func StringifyPublicKey(key *rsa.PublicKey) string {
+	return fmt.Sprintf("%s", base64.StdEncoding.EncodeToString(key.N.Bytes()))
+}
+
+func UnStringifyPublicKey(content string) *rsa.PublicKey {
+
+	N := big.NewInt(0)
+	key, _ := base64.StdEncoding.DecodeString(content)
+	N = N.SetBytes(key)
+
+	return &rsa.PublicKey{N, 65537}
+}
+
 func savePublicKey(key *rsa.PublicKey, identifier string, filename string) error {
-	str := fmt.Sprintf("%s", base64.StdEncoding.EncodeToString(key.N.Bytes()))
-	err := saveFile(filename, []byte(identifier+" "+str+"\n"))
+
+	err := saveFile(filename, []byte(identifier+" "+StringifyPublicKey(key)+"\n"))
 	if err != nil {
 		return err
 	}

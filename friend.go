@@ -1,12 +1,13 @@
 package main
 
 import (
+	//"crypto/md5"
 	"crypto/rsa"
 	"fmt"
 	"strings"
 )
 
-//Friend contain all information to encrypt and decrypt message
+//Friend contain all information to encrypt message for a friend, yes, without kidding
 type Friend struct {
 	Name      string
 	PublicKey *rsa.PublicKey
@@ -15,16 +16,20 @@ type Friend struct {
 //Local FriendList (if you have some friend)
 var FriendList []*Friend
 
-func LoadFriends(filename string) ([]Friend, error) {
+func LoadFriends(filename string) error {
 	filecontent, err := loadFile(filename)
 	if err != nil {
-		return nil, err
+		return err
 	}
 	friendList := strings.Split(string(filecontent), "\n")
 	for _, friend := range friendList {
-		fmt.Println(friend)
+		s := strings.Split(friend, " ")
+		if len(s) != 2 {
+			break
+		}
+		FriendList = append(FriendList, &Friend{s[0], UnStringifyPublicKey(s[1])})
 	}
-	return nil, nil
+	return nil
 }
 
 //Add friend f to FriendList In case I change simple list to a more complex type of data Binary tree or linked list will see later
@@ -34,20 +39,13 @@ func (f *Friend) Add() error {
 }
 
 func (f *Friend) Registrer(filename string) error {
+	var content string = fmt.Sprintf("%s %v\n", f.Name, StringifyPublicKey(f.PublicKey))
+
 	f.Add()
 
-	f, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY, 0600)
-	if err != nil {
-		return err
-	}
+	err := appendFile(filename, []byte(content))
 
-	defer f.Close()
-
-	if _, err = f.WriteString(text); err != nil {
-		return err
-	}
-
-	return nil
+	return err
 }
 
 func (f *Friend) Remove(filename string) error {

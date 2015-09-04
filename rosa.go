@@ -55,7 +55,6 @@ func Generate(identifier string, save bool) (*rsa.PrivateKey, *rsa.PublicKey, er
 		savePrivateKey(privatekey, usr.HomeDir+"/.rosa/key.priv")
 		savePublicKey(publickey, identifier, usr.HomeDir+"/.rosa/key.pub")
 	}
-
 	return privatekey, publickey, nil
 }
 
@@ -66,6 +65,16 @@ func main() {
 	if err != nil {
 		fmt.Println(err)
 	}
+
+	LoadFriends(usr.HomeDir + "/.rosa/friend_list")
+	fmt.Printf("%+v", len(FriendList))
+	// for i := 0; i < 40; i++ {
+	// 	name := fmt.Sprintf("Test%d", i)
+	// 	_, pub, _ := Generate(name, false)
+	// 	f := &Friend{name, pub}
+	// 	f.Registrer(usr.HomeDir + "/.rosa/friend_list")
+	// }
+
 	// msg, _ := Encrypt([]byte("Hello world"), publickey)
 	// decrypted, _ := Decrypt(msg, wierd)
 
