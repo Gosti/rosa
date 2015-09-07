@@ -49,9 +49,19 @@ func (f *Friend) Registrer(filename string) error {
 }
 
 func (f *Friend) Remove(filename string) error {
+	// Should I rewrote a shitty rewriter ? or do something a bit better ? like a grep... Seriously dunno
 	return nil
 }
 
 func (f *Friend) Encrypt(content []byte) ([]byte, error) {
 	return Encrypt(content, f.PublicKey)
+}
+
+func SeekByName(name string) *Friend {
+	for _, f := range FriendList {
+		if f.Name == name {
+			return f
+		}
+	}
+	return nil
 }

@@ -52,31 +52,33 @@ func Generate(identifier string, save bool) (*rsa.PrivateKey, *rsa.PublicKey, er
 	publickey = &privatekey.PublicKey
 
 	if save == true {
-		savePrivateKey(privatekey, usr.HomeDir+"/.rosa/key.priv")
-		savePublicKey(publickey, identifier, usr.HomeDir+"/.rosa/key.pub")
+		savePrivateKey(privatekey, usr.HomeDir+"/.rosa/key2.priv")
+		savePublicKey(publickey, identifier, usr.HomeDir+"/.rosa/key2.pub")
 	}
 	return privatekey, publickey, nil
 }
 
 func main() {
 	usr, _ := user.Current()
-	Generate(usr.Username, true)
+	//Generate(usr.Username, true)
 	_, err := LoadPrivateKey(usr.HomeDir + "/.rosa/key.priv")
 	if err != nil {
 		fmt.Println(err)
 	}
 
 	LoadFriends(usr.HomeDir + "/.rosa/friend_list")
-	fmt.Printf("%+v", len(FriendList))
+	fmt.Printf("%+v\n", len(FriendList))
+	me2 := SeekByName("gostimacbook")
 	// for i := 0; i < 40; i++ {
 	// 	name := fmt.Sprintf("Test%d", i)
 	// 	_, pub, _ := Generate(name, false)
 	// 	f := &Friend{name, pub}
 	// 	f.Registrer(usr.HomeDir + "/.rosa/friend_list")
 	// }
+	msg, _ := me2.Encrypt([]byte("Hello World!"))
+	fmt.Println(string(msg))
+	priv, err := LoadPrivateKey(usr.HomeDir + "/.rosa/key2.priv")
+	decrypted, _ := Decrypt(msg, priv)
 
-	// msg, _ := Encrypt([]byte("Hello world"), publickey)
-	// decrypted, _ := Decrypt(msg, wierd)
-
-	// fmt.Printf("%v\n", string(decrypted))
+	fmt.Printf("%v\n", string(decrypted))
 }
