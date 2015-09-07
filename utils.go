@@ -2,11 +2,19 @@ package main
 
 import (
 	"bytes"
+	"crypto/md5"
 	"encoding/gob"
+	"encoding/hex"
 	"io"
 	"io/ioutil"
 	"os"
 )
+
+func GetMD5Hash(text string) string {
+	hasher := md5.New()
+	hasher.Write([]byte(text))
+	return hex.EncodeToString(hasher.Sum(nil))
+}
 
 func getBytes(data interface{}) ([]byte, error) {
 	var buf bytes.Buffer
