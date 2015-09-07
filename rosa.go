@@ -67,15 +67,8 @@ func main() {
 	}
 
 	LoadFriends(usr.HomeDir + "/.rosa/friend_list")
-<<<<<<< HEAD
 	fmt.Printf("%+v\n", len(FriendList))
 	me2 := SeekByName("gostimacbook")
-=======
-	fmt.Println(len(FriendList))
-	FriendList["8b49905dcce57a634e18e386aa7f6b59"].Remove("fe")
-	fmt.Println(len(FriendList))
-	fmt.Println(FriendList["8b49905dcce57a634e18e386aa7f6b59"])
->>>>>>> 1b66737c986c7de1e0b5fa037a7e2519d9361d05
 	// for i := 0; i < 40; i++ {
 	// 	name := fmt.Sprintf("Test%d", i)
 	// 	_, pub, _ := Generate(name, false)
