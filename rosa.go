@@ -1,13 +1,17 @@
-package main
+// Package rosa wrap the RSA package in a simplified form
+package rosa
 
 import (
 	"crypto/md5"
 	"crypto/rand"
 	"crypto/rsa"
-	"fmt"
-	"os/user"
 )
 
+var PublicKeyPath string
+var PrivateKeyPath string
+var FriendListPath string
+
+//Decrypt decrypt the given message with the given private key.
 func Decrypt(content []byte, privatekey *rsa.PrivateKey) ([]byte, error) {
 	md5hash := md5.New()
 	label := []byte("")
@@ -20,6 +24,7 @@ func Decrypt(content []byte, privatekey *rsa.PrivateKey) ([]byte, error) {
 	return decryptedmsg, nil
 }
 
+//Encrypt Encrypt the given message with the given public key.
 func Encrypt(content []byte, publickey *rsa.PublicKey) ([]byte, error) {
 	md5hash := md5.New()
 	label := []byte("")
@@ -31,12 +36,13 @@ func Encrypt(content []byte, publickey *rsa.PublicKey) ([]byte, error) {
 	return encryptedmsg, nil
 }
 
+//Generate is use to create a pair of keys (Private and Public) you can specify if you want to save them in a file,
+// the path is defined by PrivateKeyPath and PublicKeyPath global variable
 func Generate(identifier string, save bool) (*rsa.PrivateKey, *rsa.PublicKey, error) {
 	var publickey *rsa.PublicKey
 	var privatekey *rsa.PrivateKey
 
-	usr, err := user.Current()
-	privatekey, err = rsa.GenerateKey(rand.Reader, 1024)
+	privatekey, err := rsa.GenerateKey(rand.Reader, 1024)
 
 	if err != nil {
 		return nil, nil, err
@@ -52,33 +58,8 @@ func Generate(identifier string, save bool) (*rsa.PrivateKey, *rsa.PublicKey, er
 	publickey = &privatekey.PublicKey
 
 	if save == true {
-		savePrivateKey(privatekey, usr.HomeDir+"/.rosa/key2.priv")
-		savePublicKey(publickey, identifier, usr.HomeDir+"/.rosa/key2.pub")
+		savePrivateKey(privatekey, PrivateKeyPath)
+		savePublicKey(publickey, identifier, PublicKeyPath)
 	}
 	return privatekey, publickey, nil
-}
-
-func main() {
-	usr, _ := user.Current()
-	//Generate(usr.Username, true)
-	_, err := LoadPrivateKey(usr.HomeDir + "/.rosa/key.priv")
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	LoadFriends(usr.HomeDir + "/.rosa/friend_list")
-	fmt.Printf("%+v\n", len(FriendList))
-	me2 := SeekByName("gostimacbook")
-	// for i := 0; i < 40; i++ {
-	// 	name := fmt.Sprintf("Test%d", i)
-	// 	_, pub, _ := Generate(name, false)
-	// 	f := &Friend{name, pub}
-	// 	f.Registrer(usr.HomeDir + "/.rosa/friend_list")
-	// }
-	msg, _ := me2.Encrypt([]byte("Hello World!"))
-	fmt.Println(string(msg))
-	priv, err := LoadPrivateKey(usr.HomeDir + "/.rosa/key2.priv")
-	decrypted, _ := Decrypt(msg, priv)
-
-	fmt.Printf("%v\n", string(decrypted))
 }

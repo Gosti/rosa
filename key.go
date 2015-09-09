@@ -1,4 +1,4 @@
-package main
+package rosa
 
 import (
 	"crypto/rsa"

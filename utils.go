@@ -1,39 +1,18 @@
-package main
+package rosa
 
 import (
-	"bytes"
 	"crypto/md5"
-	"encoding/gob"
 	"encoding/hex"
 	"io"
 	"io/ioutil"
 	"os"
 )
 
+//GetMD5Hash help you to get the key for the map FriendList
 func GetMD5Hash(text string) string {
 	hasher := md5.New()
 	hasher.Write([]byte(text))
 	return hex.EncodeToString(hasher.Sum(nil))
-}
-
-func getBytes(data interface{}) ([]byte, error) {
-	var buf bytes.Buffer
-	enc := gob.NewEncoder(&buf)
-	err := enc.Encode(data)
-	if err != nil {
-		return nil, err
-	}
-	return buf.Bytes(), nil
-}
-
-func getInterface(bts []byte, data interface{}) error {
-	buf := bytes.NewBuffer(bts)
-	dec := gob.NewDecoder(buf)
-	err := dec.Decode(data)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func saveFile(filename string, content []byte) error {
@@ -50,7 +29,6 @@ func saveFile(filename string, content []byte) error {
 }
 
 // I know this function is pretty stupid but I really want All I/O manipulation and include in this file
-
 func loadFile(filename string) ([]byte, error) {
 	return ioutil.ReadFile(filename)
 }
