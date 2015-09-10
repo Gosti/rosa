@@ -28,22 +28,24 @@ import (
 
 func main() {
 	privateKey, publicKey, err := rosa.Generate("Example", false) // you generate a Key pair that you will use later (no need to save them)
-
 	if err != nil {
 		panic(err)
 	}
 
 	friend := &rosa.Friend{"Example", publicKey} // You create a new friends using your publickey as test
 
-	fmt.Println(len(rosa.FriendList))
-	friend.Add() // you add it to the rosa.FriendList
-	fmt.Println(len(rosa.FriendList))
-
 	cryptedMessage, err := friend.Encrypt([]byte("Hello World !")) // Same as doing rosa.Encrypt([]byte("Hello World !"), friend.PublicKey)
-
+	if err != nil {
+		panic(err)
+	}
+	
 	fmt.Println(cryptedMessage)
 
 	msg, err := rosa.Decrypt(cryptedMessage, privateKey) // You decrypt it as well
+	if err != nil {
+		panic(err)
+	}
+	
 	fmt.Println(string(msg))
 }
 ```
