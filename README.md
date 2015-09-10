@@ -1,6 +1,6 @@
 # RoSA
 
-Rosa is a fast and easy way to implement RSA in your go project.
+RoSA is a fast and easy way to implement RSA in your go project.
 
 ### Version
 0.0.1
@@ -16,56 +16,34 @@ Rosa is a fast and easy way to implement RSA in your go project.
 go get github.com/mrgosti/rosa
 ```
 
-### Usage
+### Tutorial / Example
 
-#### Basics
-
-Import package
 ```go
-import "github.com/mrgosti/rosa"
-```
+package main
 
-Generate a new pair of key
-```go
+import (
+	"fmt"
+	"github.com/mrgosti/rosa"
+)
 
-```
+func main() {
+	privateKey, publicKey, err := rosa.Generate("Example", false) // you generate a Key pair that you will use later (no need to save them)
 
-Encrypt a message
-```go
-var key *rsa.PublicKey
-//key is some *rsa.PublicKey you've load
-message := []byte("Hello world!")
-cryptedMessage, err := rosa.Encrypt(message, key)
-```
+	if err != nil {
+		panic(err)
+	}
 
-#### Friends
+	friend := &rosa.Friend{"Example", publicKey} // You create a new friends using your publickey as test
 
-Friends Struct
-```go
-type Friend struct {
-	Name      string
-	PublicKey *rsa.PublicKey
+	fmt.Println(len(rosa.FriendList))
+	friend.Add() // you add it to the rosa.FriendList
+	fmt.Println(len(rosa.FriendList))
+
+	cryptedMessage, err := friend.Encrypt([]byte("Hello World !")) // Same as doing rosa.Encrypt([]byte("Hello World !"), friend.PublicKey)
+
+	fmt.Println(cryptedMessage)
+
+	msg, err := rosa.Decrypt(cryptedMessage, privateKey) // You decrypt it as well
+	fmt.Println(string(msg))
 }
-```
-
-Load your friends (the already known key)
-```go
-rosa.LoadFriends(filename string)
-// Will load Friends in rosa.FriendList
-```
-
-You can seek them by name
-```go
-f := rosa.SeekByName(name string) *Friend
-```
-
-Or by the md5 hash of their PublicKey
-```go
-rosa.FriendList[rosa.GetMD5Hash(*your key*)]
-```
-
-You can encrypt message for a friends
-```go
-f.Encrypt(content []byte) ([]byte, error)
-// Just a shorthand for rosa.Encrypt
 ```
