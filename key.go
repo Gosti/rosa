@@ -28,10 +28,12 @@ func savePrivateKey(key *rsa.PrivateKey, filename string) error {
 	return nil
 }
 
+// StringifyPublicKey create a base64 encoded version of the public key, usefull for Friends saving or sharing
 func StringifyPublicKey(key *rsa.PublicKey) string {
 	return fmt.Sprintf("%s", base64.StdEncoding.EncodeToString(key.N.Bytes()))
 }
 
+// UnStringifyPublicKey create *rsa.PublicKey from a base64 encoded string, assuming that the exposant is 65537 (See wikipedia for further information)
 func UnStringifyPublicKey(content string) *rsa.PublicKey {
 
 	N := big.NewInt(0)
@@ -50,6 +52,7 @@ func savePublicKey(key *rsa.PublicKey, identifier string, filename string) error
 	return nil
 }
 
+// LoadPrivateKey open a file and return you the PEM and PKCS1 decoded *rsa.PrivateKey
 func LoadPrivateKey(filename string) (*rsa.PrivateKey, error) {
 	filecontent, err := loadFile(filename)
 	if err != nil {
