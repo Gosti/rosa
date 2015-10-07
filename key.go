@@ -33,14 +33,14 @@ func StringifyPublicKey(key *rsa.PublicKey) string {
 	return fmt.Sprintf("%s", base64.StdEncoding.EncodeToString(key.N.Bytes()))
 }
 
-// UnStringifyPublicKey create *rsa.PublicKey from a base64 encoded string, assuming that the exposant is 65537 (See wikipedia for further information)
-func UnStringifyPublicKey(content string) *rsa.PublicKey {
+// UnStringifyPublicKey create *rsa.PublicKey from a base64 encoded string, assuming that the exposant is 65537 (See wikipedia for further information). Throw an error if the key is not valid
+func UnStringifyPublicKey(content string) (*rsa.PublicKey, error) {
 
 	N := big.NewInt(0)
-	key, _ := base64.StdEncoding.DecodeString(content)
+	key, err := base64.StdEncoding.DecodeString(content)
 	N = N.SetBytes(key)
 
-	return &rsa.PublicKey{N, 65537}
+	return &rsa.PublicKey{N, 65537}, err
 }
 
 func savePublicKey(key *rsa.PublicKey, identifier string, filename string) error {

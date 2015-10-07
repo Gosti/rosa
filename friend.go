@@ -32,7 +32,11 @@ func LoadFriends(filename string) error {
 		if len(s) != 2 {
 			break
 		}
-		FriendList[GetMD5Hash(s[1])] = &Friend{s[0], UnStringifyPublicKey(s[1])}
+		key, err := UnStringifyPublicKey(s[1])
+		if err != nil {
+			return nil
+		}
+		FriendList[GetMD5Hash(s[1])] = &Friend{s[0], key}
 	}
 	return nil
 }
@@ -43,12 +47,16 @@ func (f *Friend) Add() error {
 	return nil
 }
 
-// Register a Friend in the file that contains all the Friends, execute f.add too
+// Register a Friend in the file that contains all the Friends, execute f.add too, Replace in case of duplicate
 func (f *Friend) Registrer(filename string) error {
 	var content = fmt.Sprintf("%s %v\n", f.Name, StringifyPublicKey(f.PublicKey))
-
+	if already := SeekByName(f.Name); already != nil {
+		err := already.Delete(filename)
+		if err != nil {
+			return err
+		}
+	}
 	f.Add()
-
 	err := appendFile(filename, []byte(content))
 
 	return err
@@ -78,8 +86,6 @@ func (f *Friend) Delete(filename string) error {
 func (f *Friend) Encrypt(content []byte) ([]byte, error) {
 	return Encrypt(content, f.PublicKey)
 }
-
-//BUG(gosti) SeekByName may bug if multiple same name
 
 //SeekByName help you to find a friend by is name
 func SeekByName(name string) *Friend {
