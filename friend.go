@@ -48,7 +48,7 @@ func (f *Friend) Add() error {
 }
 
 // Register a Friend in the file that contains all the Friends, execute f.add too, Replace in case of duplicate
-func (f *Friend) Registrer(filename string) error {
+func (f *Friend) Register(filename string) error {
 	var content = fmt.Sprintf("%s %v\n", f.Name, StringifyPublicKey(f.PublicKey))
 	if already := SeekByName(f.Name); already != nil {
 		err := already.Delete(filename)

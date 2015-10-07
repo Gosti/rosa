@@ -7,10 +7,6 @@ import (
 	"crypto/rsa"
 )
 
-var PublicKeyPath string
-var PrivateKeyPath string
-var FriendListPath string
-
 //Decrypt decrypt the given message with the given private key.
 func Decrypt(content []byte, privatekey *rsa.PrivateKey) ([]byte, error) {
 	md5hash := md5.New()
